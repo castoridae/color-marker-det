@@ -146,13 +146,10 @@ ColorDetection::ColorDetection() {
 
 void ColorDetection::initSettingsWindow() {
 
-
 	namedWindow(SETTINGS_WINDOW_NAME, CV_WINDOW_AUTOSIZE);
 
 	//Create trackbars in "Control" window
 	double h;
-
-	cout <<  (*ColorDetection::tolerationLevel)[0] << "akamak";
 
 		createTrackbar("Toleration value H", SETTINGS_WINDOW_NAME, &((*ColorDetection::tolerationLevel)[0]),100);
 		createTrackbar("Toleration value S", SETTINGS_WINDOW_NAME, (*ColorDetection::tolerationLevel+1),100);

@@ -6,6 +6,7 @@
  */
 
 #include "ColorDetection.h"
+#include "CameraCalibration.h"
 
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
@@ -28,11 +29,12 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 	ColorDetection *c = new ColorDetection();
+	CameraCalibration *cc = new CameraCalibration();
 
 	namedWindow("Original", CV_WINDOW_AUTOSIZE);
 	setMouseCallback("Original", ColorDetection::mouseHandler, NULL);
 
-	VideoCapture cap(1); //capture the video from webcam
+	VideoCapture cap(0); //capture the video from webcam
 	if (!cap.isOpened())  // if not success, exit program
 	{
 		cout << "Cannot open the web cam" << endl;
@@ -46,11 +48,33 @@ int main(int argc, char* argv[]) {
 	Mat imgLines = Mat::zeros(imgTmp.size(), CV_8UC3);
 
 	view = imgTmp;
+
+	Mat rvec(3, 1, CV_64F);
+	Mat tvec(3, 1, CV_64F);
+	Mat cameraMatrix(3, 3, CV_64F);
+	Mat distCoeffs(3, 3, CV_64F);
+	vector<Point3f> objectPoints;
+	vector<Point3f> imagePoints;
+
+	cc->readCameraParams(cameraMatrix, distCoeffs);
+//	cc->readPoints(objectPoints, imagePoints);
+
+	cout 	<< "camera matrix: " << cameraMatrix << endl
+			<< "distortion coeffs: " << distCoeffs << endl
+			<< "imagePoints: " << imagePoints << endl
+			<< "objectPoints: " << objectPoints << endl
+			<< "tvec: " << tvec << endl
+			<< "rvec: " << rvec << endl;
+
+	if (distCoeffs.empty() != 1 && objectPoints.empty() != 1) {
+		solvePnP(Mat(objectPoints), Mat(imagePoints), cameraMatrix,
+				distCoeffs, rvec, tvec, false);
+	}
+
 	while (true) {
 
 		bool bSuccess = cap.read(view); // read a new frame from video
 //		view = imread("/home/bober/workspace/hello_world/src/color4.0.png", CV_LOAD_IMAGE_COLOR);
-
 
 		if (!bSuccess) //if not success, break loop
 		{
@@ -58,12 +82,10 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 
-
 		c->displayMultiTreshold(view);
 		c->drawLines(view);
 
 		imshow("Original", view); //show the original image
-
 
 		char key = (char) waitKey(25);
 		if (key == 27) {
@@ -87,6 +109,8 @@ int main(int argc, char* argv[]) {
 			c->addMarker(*tmpMarker);
 			mode = CAPTURING;
 		}
+
+
 
 
 	}
