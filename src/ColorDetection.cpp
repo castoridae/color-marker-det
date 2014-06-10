@@ -54,10 +54,12 @@ int main(int argc, char* argv[]) {
 	Mat cameraMatrix(3, 3, CV_64F);
 	Mat distCoeffs(3, 3, CV_64F);
 	vector<Point3f> objectPoints;
-	vector<Point3f> imagePoints;
+	vector<Point2f> imagePoints;
 
 	cc->readCameraParams(cameraMatrix, distCoeffs);
-//	cc->readPoints(objectPoints, imagePoints);
+	cc->readPoints(objectPoints, imagePoints);
+
+
 
 	cout 	<< "camera matrix: " << cameraMatrix << endl
 			<< "distortion coeffs: " << distCoeffs << endl
@@ -66,10 +68,7 @@ int main(int argc, char* argv[]) {
 			<< "tvec: " << tvec << endl
 			<< "rvec: " << rvec << endl;
 
-	if (distCoeffs.empty() != 1 && objectPoints.empty() != 1) {
-		solvePnP(Mat(objectPoints), Mat(imagePoints), cameraMatrix,
-				distCoeffs, rvec, tvec, false);
-	}
+
 
 	while (true) {
 
@@ -105,13 +104,28 @@ int main(int argc, char* argv[]) {
 
 		if(mode == SELECT_MARKER){
 
-		}else if(mode == MARKER_SELECTED){
+		} else if (mode == MARKER_SELECTED){
 			c->addMarker(*tmpMarker);
 			mode = CAPTURING;
+
 		}
 
+		//show 3D position of marker
+		if (c->markers->size() == 4) {
 
+			imagePoints.clear();
+			for (int i = 0; i < 4; i++) {
+				imagePoints.push_back(c->markers->at(i).calculateCenter());
+			}
 
+			if (distCoeffs.empty() != 1 && objectPoints.empty() != 1) {
+				solvePnP(Mat(objectPoints), Mat(imagePoints), cameraMatrix,
+						distCoeffs, rvec, tvec, false);
+			}
+
+			cout 	<< "rvec: " << rvec << endl
+					<< "tvec: " << tvec << endl;
+		}
 
 	}
 

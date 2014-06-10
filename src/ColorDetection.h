@@ -114,6 +114,8 @@ public:
 
 	int* getTolerationLevel();
 
+	void fillImagePoints();
+
 	void drawLines();
 
 	void drawLines(Mat);
@@ -207,6 +209,13 @@ void ColorDetection::drawLines()
 
 }
 
+void ColorDetection::fillImagePoints() {
+	int markersCnt = markers->size();
+	for (int i = 0; i < markersCnt - 1; i++) {
+		cout << "marker " << i << ": " << markers->at(i).calculateCenter() << endl;
+		}
+}
+
 void ColorDetection::drawLines(Mat view)
 {
 	//		line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -217,7 +226,7 @@ void ColorDetection::drawLines(Mat view)
 		Point start = markers->at(i).calculateCenter();
 		Point end = markers->at(i+1).calculateCenter();
 
-		cout << "drawing line " << start << " to " << end << endl;
+//		cout << "drawing line " << start << " to " << end << endl;
 
 		int thickness = 2;
 		  int lineType = 8;

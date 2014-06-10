@@ -40,6 +40,8 @@ public:
 
 	int* hh;
 
+	vector<Point2f> imagePoints;
+
 	Marker(){}
 	Marker(Mat);
 	Marker(Mat,int[]);
@@ -145,7 +147,7 @@ Point& Marker::calculateCenter() {
 
 
 	}
-	cout << center << "  dArea  " << dArea << endl;
+//	cout << center << "  dArea  " << dArea << endl;
 	return center;
 }
 

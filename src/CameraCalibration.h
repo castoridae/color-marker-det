@@ -27,7 +27,7 @@ class CameraCalibration {
 public:
 
 	void readCameraParams(Mat& cameraMatrix, Mat& distCoeffs);
-	void readPoints(vector<Point3f>& objectPoints, vector<Point3f>& imagePoints);
+	void readPoints(vector<Point3f>& objectPoints, vector<Point2f>& imagePoints);
 };
 
 void CameraCalibration::readCameraParams(Mat& cameraMatrix, Mat& distCoeffs) {
@@ -39,46 +39,26 @@ void CameraCalibration::readCameraParams(Mat& cameraMatrix, Mat& distCoeffs) {
 //	cout << "camera matrix: " << cameraMatrix << endl
 //		 << "distortion coeffs: " << distCoeffs << endl;
 
-	FileNode features = fs2["features"];
-	FileNodeIterator it = features.begin(), it_end = features.end();
-	int idx = 0;
-	std::vector<uchar> lbpval;
-
-	// iterate through a sequence using FileNodeIterator
-	for( ; it != it_end; ++it, idx++ )
-	{
-		cout << "feature #" << idx << ": ";
-		cout << "x=" << (int)(*it)["x"] << ", y=" << (int)(*it)["y"] << ", lbp: (";
-		// you can also easily read numerical arrays using FileNode >> std::vector operator.
-		(*it)["lbp"] >> lbpval;
-		for( int i = 0; i < (int)lbpval.size(); i++ )
-			cout << " " << (int)lbpval[i];
-		cout << ")" << endl;
-	}
-
-	fs2.release();
 }
 
-void CameraCalibration::readPoints(vector<Point3f>& objectPoints, vector<Point3f>& imagePoints) {
+void CameraCalibration::readPoints(vector<Point3f>& objectPoints, vector<Point2f>& imagePoints) {
 
-	float objectHeight = 10; //temporary value from ass
-	float objectWidth = 10; //temporary value from ass
+	float objectHeight = 4; //temporary value from there and there
+	float objectWidth = 1; //temporary value from there and there
 
 	//Initialising the 3D-Points for the chessboard
-	float a = 0.2f; //The widht/height of each square of the chessboard object
-	float rot = 0.0f;
+	float a = 1.0f; //The widht/height of each square of the chessboard object
 	Point3f _3DPoint;
-	float y = (((objectHeight - 1.0f) / 2.0f) * a) + (a / 2.0f);
+	float y = 0;
 	float x = 0.0f;
-	for (int h = 0; h < objectHeight; h++, y += a) {
-		x = (((objectWidth - 2.0f) / 2.0f) * (-a)) - (a / 2.0f);
-		for (int w = 0; w < objectWidth; w++, x += a) {
-			_3DPoint.x = x;
-			_3DPoint.y = y;
-			_3DPoint.z = 0.0f;
-			objectPoints.push_back(_3DPoint);
-		}
+
+	for (int w = 0; w < objectHeight; w++, y += a) {
+		_3DPoint.x = x;
+		_3DPoint.y = y;
+		_3DPoint.z = 0.0f;
+		objectPoints.push_back(_3DPoint);
 	}
+
 
 }
 
