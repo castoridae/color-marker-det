@@ -47,12 +47,6 @@ void mouseHandler(int event, int x, int y, int flags, void* param);
 
 class ColorDetection {
 
-	//instancja
-
-
-
-
-
 public:
 
 	static ColorDetection* instance;
@@ -62,6 +56,10 @@ public:
 
 	// wielkośc elementu strukturalnego
 	static int *structSize;
+
+	static int *minBlob;
+
+	static int *maxBlob;
 
 	//wskaźnik na oryginalny obraz;
 	Mat imgView;
@@ -95,8 +93,6 @@ public:
 	void static mouseHandler(int event, int x, int y, int flags, void* param);
 
 	void addMarker(Marker m) {
-		cout << m.getValue() << " asd " << endl;
-		cout << m.toleration << " asd " << endl;
 		markers->push_back(m);
 	}
 
@@ -133,6 +129,8 @@ public:
 
 const string ColorDetection::SETTINGS_WINDOW_NAME = "Settings window";
 int *ColorDetection::structSize = new int(1);
+int *ColorDetection::minBlob = new int(500);
+int *ColorDetection::maxBlob = new int(50000);
 int levels[] = {10,10,10};
 int (*p) = levels;
 //p = levels;
@@ -141,20 +139,14 @@ int **ColorDetection::tolerationLevel = &p;
 ColorDetection::ColorDetection() {
 	markers = new vector<Marker>();
 
-
-
 	initSettingsWindow();
 }
 
 void ColorDetection::initSettingsWindow() {
 
 	namedWindow(SETTINGS_WINDOW_NAME, CV_WINDOW_AUTOSIZE);
-
-	//Create trackbars in "Control" window
-	double h;
-
-
-
+	createTrackbar("Min blob size", SETTINGS_WINDOW_NAME, this->minBlob ,10000);
+	createTrackbar("Max blob size", SETTINGS_WINDOW_NAME, this->maxBlob ,10000);
 }
 
 const Mat& ColorDetection::getView() const {
@@ -164,19 +156,6 @@ const Mat& ColorDetection::getView() const {
 void ColorDetection::setView(const Mat& viewa) {
 	view = viewa;
 }
-
-//int* ColorDetection::getTolerationLevel() {
-//	return ColorDetection::tolerationLevel;
-//}
-
-//Mat ColorDetection::tresholdImage(Marker m, Mat imgOriginal) {
-//	Mat imgHSV;
-//	Mat imgThresholded;
-//	cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
-//	inRange(imgHSV, Scalar(5, 5, 5), Scalar(125, 105, 185), imgThresholded);
-//	return imgThresholded;
-//}
-
 
 void ColorDetection::displayMultiTreshold(Mat view) {
 	int markersCnt = markers->size();
@@ -223,19 +202,10 @@ void ColorDetection::drawLines(Mat view)
 		Point start = markers->at(i).calculateCenter();
 		Point end = markers->at(i+1).calculateCenter();
 
-//		cout << "drawing line " << start << " to " << end << endl;
-
 		int thickness = 2;
-		  int lineType = 8;
-		  line( view,
-		        start,
-		        end,
-		        Scalar( 255, 50, 50 ),
-		        thickness,
-		        8 );
+		int lineType = 8;
+		line( view, start, end, Scalar( 255, 50, 50 ), thickness, 8 );
 
-//		  waitKey();
-//		line(view, markers->at(i).calculateCenter(),markers->at(i+1).calculateCenter(),Scalar(0,0,255),1,8,0);
 	}
 
 }
@@ -298,10 +268,8 @@ void ColorDetection::mouseHandler(int event, int x, int y, int flags, void* para
 
 							structSize = new int(3);
 
-							tmpMarker = new Marker(view, toleration, structSize);
-
-							tmpMarker->setValue(avgPixelIntensity);
-
+							tmpMarker = new Marker(view, avgPixelIntensity, structSize);
+							tmpMarker->setBlobSize(ColorDetection::minBlob,ColorDetection::maxBlob);
 							mode = MARKER_SELECTED;
 						}
 

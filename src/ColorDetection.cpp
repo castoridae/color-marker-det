@@ -1,8 +1,8 @@
 /*
  * ColorDetection.cpp
  *
- *  Created on: Jun 1, 2014
- *      Author: bober
+ *  Created on: May 1, 2014
+ *      Author: Kamil Kopczyk
  */
 
 #include "ColorDetection.h"
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
 	namedWindow("Original", CV_WINDOW_AUTOSIZE);
 	setMouseCallback("Original", ColorDetection::mouseHandler, NULL);
 
-	VideoCapture cap(0); //capture the video from webcam
+	VideoCapture cap(1); //capture the video from webcam
 	if (!cap.isOpened())  // if not success, exit program
 	{
 		cout << "Cannot open the web cam" << endl;
@@ -116,7 +116,9 @@ int main(int argc, char* argv[]) {
 
 	while (true) {
 
-		bool bSuccess = cap.read(view); // read a new frame from video
+		bool bSuccess = cap.read(view); // odczyt nowej klatki
+
+		//testowy obraz
 //		view = imread("/home/bober/workspace/hello_world/src/color4.0.png", CV_LOAD_IMAGE_COLOR);
 
 		if (!bSuccess) //if not success, break loop
@@ -173,6 +175,8 @@ int main(int argc, char* argv[]) {
 			cout 	<< "rvec: " << s.rvec << endl
 					<< "tvec: " << s.tvec << endl;
 
+//			Projekcja wykrytch punktów na płaszczyznę 2D
+//
 //			projectPoints(s.objectPoints, s.rvec, s.tvec, s.cameraMatrix,
 //					s.distCoeffs, s.projectedPoints);
 //
