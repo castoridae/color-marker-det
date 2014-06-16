@@ -83,6 +83,37 @@ public:
 			objectPoints.push_back(_3DPoint);
 		}
 	}
+
+	void saveMarkers(ColorDetection c){
+		FileStorage fs("markers.xml", FileStorage::WRITE);
+
+		vector<Marker> markers = *(c.getMarkers());
+		fs << "markers" << "{";
+
+		for(int i = 0; i < markers.size(); i++){
+			markers[i].write(fs);
+		}
+		fs << "}";
+		fs.release();
+	}
+
+	void populateMarkers(String path, ColorDetection* c) {
+
+			FileStorage fs(path, FileStorage::READ);
+
+			FileNode features = fs["markers"];
+			FileNodeIterator it = features.begin(), it_end = features.end();
+			int idx = 0;
+
+			// iterate through a sequence using FileNodeIterator
+			for( ; it != it_end; ++it, idx++ )
+			{
+				Marker m(view, *it);
+				c->addMarker(m);
+			}
+			fs.release();
+		}
+
 };
 
 int main(int argc, char* argv[]) {
@@ -95,7 +126,7 @@ int main(int argc, char* argv[]) {
 	namedWindow("Original", CV_WINDOW_AUTOSIZE);
 	setMouseCallback("Original", ColorDetection::mouseHandler, NULL);
 
-	VideoCapture cap(s.cameraInput); //capture the video from webcam
+	VideoCapture cap(1); //capture the video from webcam
 	if (!cap.isOpened())  // if not success, exit program
 	{
 		cout << "Cannot open the web cam" << endl;
@@ -108,6 +139,10 @@ int main(int argc, char* argv[]) {
 	Mat imgLines = Mat::zeros(imgTmp.size(), CV_8UC3);
 
 	view = imgTmp;
+
+	if(argc == 2){
+		s.populateMarkers(*(argv+1),c);
+	}
 
 	s.readMarkerData();
 	s.setObjectPoints();
@@ -136,12 +171,15 @@ int main(int argc, char* argv[]) {
 		if (key == 27) {
 			cout << "escape detected lol";
 			return 0;
-		} else if (key == 'm') {
+		} else if (key == 'm' || key == 'M') {
 			cout << "Select roi" << endl;
 			mode = SELECT_MARKER;
-		} else if (key == 't') {
+		} else if (key == 't' || key == 'T' ) {
 			cout << "Market tracking stated" << endl;
 			mode = TRACKING;
+		} else if (key == 's' || key == 'S'){
+			s.saveMarkers(*c);
+			cout << "Markers saved" << endl;
 		}
 
 		if (mode == SELECT_MARKER) {

@@ -34,6 +34,8 @@ public:
 
 	static int markerCnt;
 
+	int id;
+
 	Point center;
 	Point lastPos;
 	Scalar value;
@@ -68,6 +70,7 @@ public:
 	Marker(Mat);
 	Marker(Mat, int[]);
 	Marker(Mat originalImage, Scalar value, int* structSize);
+	Marker(Mat originalImage, const FileNode& node);
 
 	Point& calculateCenter();
 
@@ -116,6 +119,38 @@ public:
 	void setBlobSize(int*, int*);
 
 	void initWindowTrackbars();
+
+	void write(FileStorage& fs) const       //Write serialization for this class
+				{
+
+			stringstream ss;
+			ss << id;
+			string str = "marker_" + ss.str();
+			fs << str << "{"
+					<< "id" << id
+					<< "center" << center
+					<< "lastPos" << lastPos
+					<< "valueH" << value[0]
+					<< "valueS" << value[1]
+					<< "valueV" << value[2]
+					<< "levelsMin_1" << *(levelsMin[0])
+					<< "levelsMin_2" << *(levelsMin[1])
+					<< "levelsMin_3" << *(levelsMin[2])
+					<< "levelsMax_1" << *(levelsMin[0])
+					<< "levelsMax_2" << *(levelsMax[1])
+					<< "levelsMax_3" << *(levelsMax[2])
+					<< "structSize" << *structSize
+					<< "openingSize" << *openingSize
+					<< "closureSize" << *closureSize
+					<< "medianSize" << *medianSize
+					<< "minBlob" << *minBlob
+					<< "maxBlob" << *maxBlob
+					<< "windowName" << windowName
+					<< "imagePoints" << imagePoints
+					<< "}";
+		}
+
+	void read(const FileNode& node);
 };
 
 Marker::Marker(Mat originalImage) {
@@ -128,14 +163,15 @@ Marker::Marker(Mat originalImage) {
 
 Marker::Marker(Mat originalImage, Scalar value, int* structSize) {
 
+	this->id = ++this->markerCnt;
+
 	this->structSize = structSize;
 
 	this->img = originalImage;
 
 	this->setValue(value);
 
-	this->tolH = this->tolS = this->tolV = new int(10);
-	cout << endl << "123" << endl;
+	this->tolH = this->tolS = this->tolV = new int(20);
 
 	this->levelsMin[0] = new int(value[0] - 10);
 	this->levelsMin[1] = new int(value[1] - 10);
@@ -159,6 +195,46 @@ Marker::Marker(Mat originalImage, Scalar value, int* structSize) {
 	this->imgTresholded = this->getTresholdedImage();
 
 }
+
+Marker::Marker(Mat originalImage, const FileNode& node){
+	this->id = ++this->markerCnt;
+	this->img = originalImage;
+
+	this->minBlob = new int(500);
+	this->maxBlob = new int(6000);
+
+	this->read(node);
+
+	this->initWindowTrackbars();
+
+	lastPos.x = -1;
+	lastPos.y = -1;
+	this->imgTresholded = this->getTresholdedImage();
+}
+
+void Marker::read(const FileNode& node)          //Read serialization for this class
+				{
+
+		this->id = ++this->markerCnt;
+
+		this->structSize = new int((int)node["structSize"]);
+
+		Scalar valueTmp((double)node["valueH"],(double)node["valueS"],(double)node["valueV"]);
+				this->setValue(valueTmp);
+
+				this->levelsMin[0] = new int((int)node["levelsMin_1"]);
+				this->levelsMin[1] = new int((int)node["levelsMin_2"]);
+				this->levelsMin[2] = new int((int)node["levelsMin_3"]);
+
+				this->levelsMax[0] = new int((int)node["levelsMax_1"]);
+				this->levelsMax[1] = new int((int)node["levelsMax_2"]);
+				this->levelsMax[2] = new int((int)node["levelsMax_3"]);
+
+				this->medianSize = new int((int)node["medianSize"]);
+				this->closureSize = new int((int)node["closureSize"]);
+				this->openingSize = new int((int)node["openingSize"]);
+
+		}
 
 Mat Marker::tresholdImage() {
 
@@ -201,7 +277,7 @@ Mat Marker::tresholdImage() {
 
 void Marker::initWindowTrackbars() {
 	stringstream ss;
-	ss << ++this->markerCnt;
+	ss << id;
 	string str = "Marker " + ss.str();
 
 	this->windowName = str;

@@ -125,6 +125,10 @@ public:
 	void setStructSize(int *structSize) {
 		this->structSize = structSize;
 	}
+
+	void setMarkers(vector<Marker>* markers) {
+		this->markers = markers;
+	}
 };
 
 const string ColorDetection::SETTINGS_WINDOW_NAME = "Settings window";
@@ -269,6 +273,11 @@ void ColorDetection::mouseHandler(int event, int x, int y, int flags,
 				tmpMarker = new Marker(view, avgPixelIntensity, structSize);
 				tmpMarker->setBlobSize(ColorDetection::minBlob,
 						ColorDetection::maxBlob);
+
+					FileStorage fs("test123.xml", FileStorage::WRITE);
+					tmpMarker->write(fs);
+					fs.release();
+
 				mode = MARKER_SELECTED;
 			}
 
