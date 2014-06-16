@@ -153,10 +153,7 @@ void ColorDetection::initSettingsWindow() {
 	//Create trackbars in "Control" window
 	double h;
 
-		createTrackbar("Toleration value H", SETTINGS_WINDOW_NAME, &((*ColorDetection::tolerationLevel)[0]),100);
-		createTrackbar("Toleration value S", SETTINGS_WINDOW_NAME, (*ColorDetection::tolerationLevel+1),100);
-		createTrackbar("Toleration value V", SETTINGS_WINDOW_NAME, (*ColorDetection::tolerationLevel+2),100);
-		createTrackbar("Struct size", SETTINGS_WINDOW_NAME, ColorDetection::structSize ,20);
+
 
 }
 
@@ -192,7 +189,7 @@ void ColorDetection::displayMultiTreshold(Mat view) {
 		Marker m = markers->at(i);
 		m.tresholdImage();
 		m.fillHoles();
-		imshow("window " + ss.str(), m.getTresholdedImage());
+		imshow(m.getWindowName(), m.getTresholdedImage());
 	}
 }
 
@@ -296,14 +293,15 @@ void ColorDetection::mouseHandler(int event, int x, int y, int flags, void* para
 
 						if (mode == SELECT_MARKER) {
 							//				int* i = ColorDetection::getInstance()->structSize;
-							int** toleration;
+							int* toleration[3];
 							int* structSize;
 
-							toleration = (ColorDetection::tolerationLevel);
-							structSize = (ColorDetection::structSize);
+							structSize = new int(3);
 
 							tmpMarker = new Marker(view, toleration, structSize);
+
 							tmpMarker->setValue(avgPixelIntensity);
+
 							mode = MARKER_SELECTED;
 						}
 

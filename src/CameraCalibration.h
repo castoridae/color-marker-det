@@ -27,6 +27,7 @@ class CameraCalibration {
 public:
 
 	void readCameraParams(Mat& cameraMatrix, Mat& distCoeffs);
+	void readPoints(vector<Point3f>& objectPoints, vector<Point2f>& imagePoints);
 };
 
 void CameraCalibration::readCameraParams(Mat& cameraMatrix, Mat& distCoeffs) {
@@ -40,8 +41,26 @@ void CameraCalibration::readCameraParams(Mat& cameraMatrix, Mat& distCoeffs) {
 
 }
 
+void CameraCalibration::readPoints(vector<Point3f>& objectPoints, vector<Point2f>& imagePoints) {
+
+	float objectHeight = 4; //temporary value from there and there
+	float objectWidth = 1; //temporary value from there and there
+
+	//Initialising the 3D-Points for the chessboard
+	float a = 1.0f; //The widht/height of each square of the chessboard object
+	Point3f _3DPoint;
+	float y = 0.0f;
+	float x = 0.0f;
+
+	for (int w = 0; w < objectHeight; w++, y += a) {
+		_3DPoint.x = x;
+		_3DPoint.y = y;
+		_3DPoint.z = 0.0f;
+		objectPoints.push_back(_3DPoint);
+	}
 
 
+}
 
 #endif /* CAMERA_CALIBRATION_H_ */
 
