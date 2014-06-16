@@ -164,11 +164,11 @@ Mat Marker::tresholdImage() {
 
 	int hMin = (*(this->levelsMin)[0]>0) ? *(this->levelsMin)[0] : 1;
 	int sMin = (*(this->levelsMin)[1]>0) ? *(this->levelsMin)[1] : 1;
-	int vMin = (*(this->levelsMin)[1]>0) ? *(this->levelsMin)[1] : 1;
+	int vMin = (*(this->levelsMin)[2]>0) ? *(this->levelsMin)[2] : 1;
 
 	int hMax = (*(this->levelsMax)[0]>0) ? *(this->levelsMax)[0] : 1;
 	int sMax = (*(this->levelsMax)[1]>0) ? *(this->levelsMax)[1] : 1;
-	int vMax = (*(this->levelsMax)[1]>0) ? *(this->levelsMax)[1] : 1;
+	int vMax = (*(this->levelsMax)[2]>0) ? *(this->levelsMax)[2] : 1;
 
 	Scalar levelsMin( hMin,sMin,vMin);
 	Scalar levelsMax( hMax,sMax,vMax);
@@ -265,27 +265,27 @@ void Marker::fillHoles() {
 		}
 
 	// convert cv::Mat to IplImage
-	IplImage img2 = img;
-
-
-	// convert to grayscale
-	IplImage gray = imgTresholded;
-
-	// get blobs
-	IplImage *labelImg = cvCreateImage( cvGetSize(&gray), IPL_DEPTH_LABEL, 1 );
-	CvBlobs blobs;
-	unsigned int result = cvLabel( &gray, labelImg, blobs );
-
-	cvFilterByArea(blobs,*minBlob,*maxBlob);
-
-	// render blobs in original image
-	cvRenderBlobs( labelImg, blobs, &img2, &img2 );
-
-	// *always* remember freeing unused IplImages
-	cvReleaseImage( &labelImg );
-
-	// convert back to cv::Mat
-	//cv::Mat output( &img );
+//	IplImage img2 = img;
+//
+//
+//	// convert to grayscale
+//	IplImage gray = imgTresholded;
+//
+//	// get blobs
+//	IplImage *labelImg = cvCreateImage( cvGetSize(&gray), IPL_DEPTH_LABEL, 1 );
+//	CvBlobs blobs;
+//	unsigned int result = cvLabel( &gray, labelImg, blobs );
+//
+//	cvFilterByArea(blobs,*minBlob,*maxBlob);
+//
+//	// render blobs in original image
+//	cvRenderBlobs( labelImg, blobs, &img2, &img2 );
+//
+//	// *always* remember freeing unused IplImages
+//	cvReleaseImage( &labelImg );
+//
+//	// convert back to cv::Mat
+//	//cv::Mat output( &img );
 }
 
 int Marker::markerCnt = 0;
