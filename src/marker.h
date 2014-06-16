@@ -137,7 +137,7 @@ Marker::Marker(Mat originalImage, int** toleration, int* structSize){
 	this->windowName = str;
 
 
-	namedWindow(str, CV_WINDOW_AUTOSIZE);
+	namedWindow(str, CV_WINDOW_NORMAL);
 	createTrackbar("Toleration value H", str, (this->toleration[0]),100);
 	createTrackbar("Toleration value S", str, (this->toleration[1]),100);
 	createTrackbar("Toleration value V", str, (this->toleration[2]),100);
@@ -225,6 +225,26 @@ void Marker::fillHoles() {
 					getStructuringElement(MORPH_ELLIPSE, Size(structSize,structSize)));
 		}
 
+
+	// convert cv::Mat to IplImage
+		IplImage img2 = img;
+
+		// convert to grayscale
+		IplImage gray = imgTresholded;
+
+		// get blobs
+		IplImage *labelImg = cvCreateImage( cvGetSize(&gray), IPL_DEPTH_LABEL, 1 );
+		CvBlobs blobs;
+		unsigned int result = cvLabel( &gray, labelImg, blobs );
+
+		// render blobs in original image
+		cvRenderBlobs( labelImg, blobs, &img2, &img2 );
+
+		// *always* remember freeing unused IplImages
+		cvReleaseImage( &labelImg );
+
+		// convert back to cv::Mat
+		//cv::Mat output( &img );
 
 
 }
