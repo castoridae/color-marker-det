@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <opencv_storage>
 <calibration_Time>"Mon 02 Jun 2014 03:20:22 PM CEST"</calibration_Time>
+<Camera_Input>1</Camera_Input>
 <nrOfFrames>25</nrOfFrames>
 <image_Width>640</image_Width>
 <image_Height>480</image_Height>

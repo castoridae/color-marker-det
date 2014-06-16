@@ -175,8 +175,30 @@ Mat Marker::tresholdImage() {
 
 	Mat imgHSV;
 	Mat tresh;
+
+
+
+
 	cvtColor(img, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
 	inRange(imgHSV, levelsMin, levelsMax, tresh);
+
+	if(hMin > hMax){
+		Mat treshTmp;
+		Scalar levelsMin( hMin,sMin,vMin);
+		Scalar levelsMax( 255,sMax,vMax);
+		inRange(imgHSV, levelsMin, levelsMax, treshTmp);
+
+		Scalar levelsMin2( 1,sMin,vMin);
+		Scalar levelsMax2( hMax,sMax,vMax);
+		inRange(imgHSV, levelsMin2, levelsMax2, tresh);
+		cout << "min: " << levelsMin << endl;
+		cout << "max: " << levelsMax << endl;
+		tresh = tresh | treshTmp;
+		}else{
+			inRange(imgHSV, levelsMin, levelsMax, tresh);
+		}
+
+
 	this->imgTresholded = tresh;
 	return this->imgTresholded;
 }
@@ -265,27 +287,27 @@ void Marker::fillHoles() {
 		}
 
 	// convert cv::Mat to IplImage
-//	IplImage img2 = img;
-//
-//
-//	// convert to grayscale
-//	IplImage gray = imgTresholded;
-//
-//	// get blobs
-//	IplImage *labelImg = cvCreateImage( cvGetSize(&gray), IPL_DEPTH_LABEL, 1 );
-//	CvBlobs blobs;
-//	unsigned int result = cvLabel( &gray, labelImg, blobs );
-//
-//	cvFilterByArea(blobs,*minBlob,*maxBlob);
-//
-//	// render blobs in original image
-//	cvRenderBlobs( labelImg, blobs, &img2, &img2 );
-//
-//	// *always* remember freeing unused IplImages
-//	cvReleaseImage( &labelImg );
-//
-//	// convert back to cv::Mat
-//	//cv::Mat output( &img );
+	IplImage img2 = img;
+
+
+	// convert to grayscale
+	IplImage gray = imgTresholded;
+
+	// get blobs
+	IplImage *labelImg = cvCreateImage( cvGetSize(&gray), IPL_DEPTH_LABEL, 1 );
+	CvBlobs blobs;
+	unsigned int result = cvLabel( &gray, labelImg, blobs );
+
+	cvFilterByArea(blobs,*minBlob,*maxBlob);
+
+	// render blobs in original image
+	cvRenderBlobs( labelImg, blobs, &img2, &img2 );
+
+	// *always* remember freeing unused IplImages
+	cvReleaseImage( &labelImg );
+
+	// convert back to cv::Mat
+	//cv::Mat output( &img );
 }
 
 int Marker::markerCnt = 0;

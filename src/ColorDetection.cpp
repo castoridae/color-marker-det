@@ -28,6 +28,8 @@ class Settings {
 
 public:
 
+	int cameraInput;
+
 	//marker properties
 	int colorsCount;
 	float markerHeight;
@@ -61,8 +63,11 @@ public:
 	void readCameraParams() {
 		FileStorage fs("src/out_camera_data.xml", FileStorage::READ);
 
+		fs["Camera_Input"] >> cameraInput;
 		fs["Camera_Matrix"] >> cameraMatrix;
 		fs["Distortion_Coefficients"] >> distCoeffs;
+
+		cout << cameraInput << " akka" << endl;
 	}
 
 	void setObjectPoints() {
@@ -88,10 +93,12 @@ int main(int argc, char* argv[]) {
 	ColorDetection *c = new ColorDetection();
 	CameraCalibration *cc = new CameraCalibration();
 
+	s.readCameraParams();
+
 	namedWindow("Original", CV_WINDOW_AUTOSIZE);
 	setMouseCallback("Original", ColorDetection::mouseHandler, NULL);
 
-	VideoCapture cap(0); //capture the video from webcam
+	VideoCapture cap(s.cameraInput); //capture the video from webcam
 	if (!cap.isOpened())  // if not success, exit program
 	{
 		cout << "Cannot open the web cam" << endl;
@@ -105,7 +112,7 @@ int main(int argc, char* argv[]) {
 
 	view = imgTmp;
 
-	s.readCameraParams();
+
 	s.readMarkerData();
 	s.setObjectPoints();
 
@@ -117,9 +124,6 @@ int main(int argc, char* argv[]) {
 	while (true) {
 
 		bool bSuccess = cap.read(view); // odczyt nowej klatki
-
-		//testowy obraz
-//		view = imread("/home/bober/workspace/hello_world/src/color4.0.png", CV_LOAD_IMAGE_COLOR);
 
 		if (!bSuccess) //if not success, break loop
 		{
@@ -142,10 +146,6 @@ int main(int argc, char* argv[]) {
 		} else if (key == 't') {
 			cout << "Market tracking stated" << endl;
 			mode = TRACKING;
-		} else if (key == 'w') {
-//			cout << "toleration incremented " << *(c->getTolerationLevel()) << endl;
-		} else if (key == 'e') {
-//			cout << "toleration decremented " << c->getTolerationLevel() << endl;
 		}
 
 		if (mode == SELECT_MARKER) {
