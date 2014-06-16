@@ -131,7 +131,7 @@ const string ColorDetection::SETTINGS_WINDOW_NAME = "Settings window";
 int *ColorDetection::structSize = new int(1);
 int *ColorDetection::minBlob = new int(500);
 int *ColorDetection::maxBlob = new int(50000);
-int levels[] = {10,10,10};
+int levels[] = { 10, 10, 10 };
 int (*p) = levels;
 //p = levels;
 int **ColorDetection::tolerationLevel = &p;
@@ -145,8 +145,8 @@ ColorDetection::ColorDetection() {
 void ColorDetection::initSettingsWindow() {
 
 	namedWindow(SETTINGS_WINDOW_NAME, CV_WINDOW_AUTOSIZE);
-	createTrackbar("Min blob size", SETTINGS_WINDOW_NAME, this->minBlob ,10000);
-	createTrackbar("Max blob size", SETTINGS_WINDOW_NAME, this->maxBlob ,10000);
+	createTrackbar("Min blob size", SETTINGS_WINDOW_NAME, this->minBlob, 10000);
+	createTrackbar("Max blob size", SETTINGS_WINDOW_NAME, this->maxBlob, 10000);
 }
 
 const Mat& ColorDetection::getView() const {
@@ -172,15 +172,13 @@ void ColorDetection::displayMultiTreshold(Mat view) {
 	}
 }
 
-
-
-void ColorDetection::drawLines()
-{
-	//		line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+void ColorDetection::drawLines() {
 
 	int markersCnt = markers->size();
 	for (int i = 0; i < markersCnt - 1; i++) {
-		line(view, markers->at(i).calculateCenter(),markers->at(i+1).calculateCenter(),Scalar(0,0,255),1,8,0);
+		line(view, markers->at(i).calculateCenter(),
+				markers->at(i + 1).calculateCenter(), Scalar(0, 0, 255), 1, 8,
+				0);
 	}
 
 }
@@ -188,38 +186,38 @@ void ColorDetection::drawLines()
 void ColorDetection::fillImagePoints() {
 	int markersCnt = markers->size();
 	for (int i = 0; i < markersCnt - 1; i++) {
-		cout << "marker " << i << ": " << markers->at(i).calculateCenter() << endl;
-		}
+		cout << "marker " << i << ": " << markers->at(i).calculateCenter()
+				<< endl;
+	}
 }
 
-void ColorDetection::drawLines(Mat view)
-{
-	//		line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+void ColorDetection::drawLines(Mat view) {
 
 	int markersCnt = markers->size();
 	for (int i = 0; i < markersCnt - 1; i++) {
 
 		Point start = markers->at(i).calculateCenter();
-		Point end = markers->at(i+1).calculateCenter();
+		Point end = markers->at(i + 1).calculateCenter();
 
 		int thickness = 2;
 		int lineType = 8;
-		line( view, start, end, Scalar( 255, 50, 50 ), thickness, 8 );
+		line(view, start, end, Scalar(255, 50, 50), thickness, 8);
 
 	}
 
 }
 
-void ColorDetection::mouseHandler(int event, int x, int y, int flags, void* param) {
+void ColorDetection::mouseHandler(int event, int x, int y, int flags,
+		void* param) {
 	Mat image_rect = Mat::zeros(1, 1, CV_8UC3);
 	Scalar avgPixelIntensity = 0;
 
-	/* user press left button */
+	/* lewy przycisk myszki wcisniety */
 	if (event == CV_EVENT_LBUTTONDOWN && !drag) {
 		point = cvPoint(x, y);
 		drag = 1;
 	}
-	/* user drag the mouse */
+	/* przeciagniecie myszki */
 	if (event == CV_EVENT_MOUSEMOVE && drag) {
 		lastPoint = cvPoint(x, y);
 		lastView = view;
@@ -231,7 +229,7 @@ void ColorDetection::mouseHandler(int event, int x, int y, int flags, void* para
 
 	}
 
-	/* user release left button */
+	/* uwolnienie lewego przycisku myszki */
 	if (event == CV_EVENT_LBUTTONUP && drag) {
 
 		int roiX = point.x;
@@ -261,30 +259,30 @@ void ColorDetection::mouseHandler(int event, int x, int y, int flags, void* para
 			int green = avgPixelIntensity.val[1];
 			int red = avgPixelIntensity.val[2];
 
-						if (mode == SELECT_MARKER) {
-							//				int* i = ColorDetection::getInstance()->structSize;
-							int* toleration[3];
-							int* structSize;
+			if (mode == SELECT_MARKER) {
 
-							structSize = new int(3);
+				int* toleration[3];
+				int* structSize;
 
-							tmpMarker = new Marker(view, avgPixelIntensity, structSize);
-							tmpMarker->setBlobSize(ColorDetection::minBlob,ColorDetection::maxBlob);
-							mode = MARKER_SELECTED;
-						}
+				structSize = new int(3);
 
-						cout << "B:G:R avg intensity: " << blue << ":" << green << ":"
-								<< red << endl;
+				tmpMarker = new Marker(view, avgPixelIntensity, structSize);
+				tmpMarker->setBlobSize(ColorDetection::minBlob,
+						ColorDetection::maxBlob);
+				mode = MARKER_SELECTED;
+			}
+
+			cout << "B:G:R avg intensity: " << blue << ":" << green << ":"
+					<< red << endl;
 		}
 
 		drag = 0;
 	}
 
-	/* user click right button: reset all */
+	/* prawy przycisk myszki: reset */
 	if (event == CV_EVENT_RBUTTONUP) {
 		drag = 0;
 	}
 }
-
 
 #endif /* COLORDETECTION_H_ */

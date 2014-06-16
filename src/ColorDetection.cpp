@@ -30,29 +30,28 @@ public:
 
 	int cameraInput;
 
-	//marker properties
 	int colorsCount;
 	float markerHeight;
 	float markerWidth;
 
-	//camera properties
 	Mat cameraMatrix;
 	Mat distCoeffs;
 
-	//rotation and translation vectors of marker
+	//wektory rotacji i translacji markera
 	Mat rvec;
 	Mat tvec;
 
-	//marker physical 3d points
+	//fizyczne punkty 3D markera
 	vector<Point3f> objectPoints;
 
-	//marker measured 2d points
+	//zmierzone punkty 2D markera
 	vector<Point2f> imagePoints;
 
 	//marker projected points
 	vector<Point2f> projectedPoints;
 
 	void readMarkerData() {
+
 		FileStorage fs("src/marker_data.xml", FileStorage::READ);
 
 		fs["colorsCount"] >> colorsCount;
@@ -61,20 +60,19 @@ public:
 	}
 
 	void readCameraParams() {
+
 		FileStorage fs("src/out_camera_data.xml", FileStorage::READ);
 
 		fs["Camera_Input"] >> cameraInput;
 		fs["Camera_Matrix"] >> cameraMatrix;
 		fs["Distortion_Coefficients"] >> distCoeffs;
-
-		cout << cameraInput << " akka" << endl;
 	}
 
 	void setObjectPoints() {
 
-		//Initialising the 3D-Points for the chessboard
+		//Inicjalizacja punktow markera
 		Point3f _3DPoint;
-		float a = markerHeight/colorsCount;
+		float a = markerHeight / colorsCount;
 		float y = 0.0f;
 		float x = 0.5f;
 
@@ -91,7 +89,6 @@ int main(int argc, char* argv[]) {
 
 	Settings s;
 	ColorDetection *c = new ColorDetection();
-	CameraCalibration *cc = new CameraCalibration();
 
 	s.readCameraParams();
 
@@ -112,7 +109,6 @@ int main(int argc, char* argv[]) {
 
 	view = imgTmp;
 
-
 	s.readMarkerData();
 	s.setObjectPoints();
 
@@ -122,10 +118,10 @@ int main(int argc, char* argv[]) {
 			<< endl << "rvec: " << s.rvec << endl;
 
 	while (true) {
+		// odczyt nowej klatki
+		bool bSuccess = cap.read(view);
 
-		bool bSuccess = cap.read(view); // odczyt nowej klatki
-
-		if (!bSuccess) //if not success, break loop
+		if (!bSuccess)
 		{
 			cout << "Cannot read a frame from video stream" << endl;
 			break;
@@ -133,8 +129,8 @@ int main(int argc, char* argv[]) {
 
 		c->displayMultiTreshold(view);
 		c->drawLines(view);
-
-		imshow("Original", view); //show the original image
+		//wyswietlenie oryginalnego obrazu z kamery
+		imshow("Original", view);
 
 		char key = (char) waitKey(25);
 		if (key == 27) {
@@ -153,27 +149,26 @@ int main(int argc, char* argv[]) {
 		} else if (mode == MARKER_SELECTED) {
 			c->addMarker(*tmpMarker);
 			mode = SELECT_MARKER;
-			if (c->markers->size() == 4) {
+			if (c->markers->size() == s.colorsCount) {
 				mode = CAPTURING;
 				cout << "Marker detected" << endl;
 			}
 		}
 
-		//show 3D position of marker
-		if (c->markers->size() == 4) {
+		//wspolrzedne 3D markera
+		if (c->markers->size() == s.colorsCount) {
 
 			s.imagePoints.clear();
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < s.colorsCount; i++) {
 				s.imagePoints.push_back(c->markers->at(i).calculateCenter());
 			}
 
 			if (s.distCoeffs.empty() != 1 && s.objectPoints.empty() != 1) {
-				solvePnP(Mat(s.objectPoints), Mat(s.imagePoints), s.cameraMatrix,
-						s.distCoeffs, s.rvec, s.tvec);
+				solvePnP(Mat(s.objectPoints), Mat(s.imagePoints),
+						s.cameraMatrix, s.distCoeffs, s.rvec, s.tvec);
 			}
 
-			cout 	<< "rvec: " << s.rvec << endl
-					<< "tvec: " << s.tvec << endl;
+			cout << "rvec: " << s.rvec << endl << "tvec: " << s.tvec << endl;
 
 //			Projekcja wykrytch punktów na płaszczyznę 2D
 //

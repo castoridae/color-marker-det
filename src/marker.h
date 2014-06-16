@@ -63,11 +63,11 @@ public:
 
 	vector<Point2f> imagePoints;
 
-	Marker(){}
+	Marker() {
+	}
 	Marker(Mat);
-	Marker(Mat,int[]);
+	Marker(Mat, int[]);
 	Marker(Mat originalImage, Scalar value, int* structSize);
-
 
 	Point& calculateCenter();
 
@@ -97,11 +97,11 @@ public:
 		this->value = value;
 	}
 
-	void setImage(Mat& imgTresholded){
+	void setImage(Mat& imgTresholded) {
 		this->imgTresholded = imgTresholded;
 	}
 
-	Mat& getImage(){
+	Mat& getImage() {
 		return this->imgTresholded;
 	}
 
@@ -118,7 +118,7 @@ public:
 	void initWindowTrackbars();
 };
 
-Marker::Marker(Mat originalImage){
+Marker::Marker(Mat originalImage) {
 
 	this->img = originalImage;
 	lastPos.x = -1;
@@ -126,7 +126,7 @@ Marker::Marker(Mat originalImage){
 	this->imgTresholded = this->tresholdImage();
 }
 
-Marker::Marker(Mat originalImage, Scalar value, int* structSize){
+Marker::Marker(Mat originalImage, Scalar value, int* structSize) {
 
 	this->structSize = structSize;
 
@@ -137,13 +137,13 @@ Marker::Marker(Mat originalImage, Scalar value, int* structSize){
 	this->tolH = this->tolS = this->tolV = new int(10);
 	cout << endl << "123" << endl;
 
-	this->levelsMin[0] = new int(value[0]-10);
-	this->levelsMin[1] = new int(value[1]-10);
-	this->levelsMin[2] = new int(value[2]-10);
+	this->levelsMin[0] = new int(value[0] - 10);
+	this->levelsMin[1] = new int(value[1] - 10);
+	this->levelsMin[2] = new int(value[2] - 10);
 
-	this->levelsMax[0] = new int(value[0]+10);
-	this->levelsMax[1] = new int(value[1]+10);
-	this->levelsMax[2] = new int(value[2]+10);
+	this->levelsMax[0] = new int(value[0] + 10);
+	this->levelsMax[1] = new int(value[1] + 10);
+	this->levelsMax[2] = new int(value[2] + 10);
 
 	this->medianSize = new int(9);
 	this->closureSize = new int(1);
@@ -162,49 +162,44 @@ Marker::Marker(Mat originalImage, Scalar value, int* structSize){
 
 Mat Marker::tresholdImage() {
 
-	int hMin = (*(this->levelsMin)[0]>0) ? *(this->levelsMin)[0] : 1;
-	int sMin = (*(this->levelsMin)[1]>0) ? *(this->levelsMin)[1] : 1;
-	int vMin = (*(this->levelsMin)[2]>0) ? *(this->levelsMin)[2] : 1;
+	int hMin = (*(this->levelsMin)[0] > 0) ? *(this->levelsMin)[0] : 1;
+	int sMin = (*(this->levelsMin)[1] > 0) ? *(this->levelsMin)[1] : 1;
+	int vMin = (*(this->levelsMin)[2] > 0) ? *(this->levelsMin)[2] : 1;
 
-	int hMax = (*(this->levelsMax)[0]>0) ? *(this->levelsMax)[0] : 1;
-	int sMax = (*(this->levelsMax)[1]>0) ? *(this->levelsMax)[1] : 1;
-	int vMax = (*(this->levelsMax)[2]>0) ? *(this->levelsMax)[2] : 1;
+	int hMax = (*(this->levelsMax)[0] > 0) ? *(this->levelsMax)[0] : 1;
+	int sMax = (*(this->levelsMax)[1] > 0) ? *(this->levelsMax)[1] : 1;
+	int vMax = (*(this->levelsMax)[2] > 0) ? *(this->levelsMax)[2] : 1;
 
-	Scalar levelsMin( hMin,sMin,vMin);
-	Scalar levelsMax( hMax,sMax,vMax);
+	Scalar levelsMin(hMin, sMin, vMin);
+	Scalar levelsMax(hMax, sMax, vMax);
 
 	Mat imgHSV;
 	Mat tresh;
 
-
-
-
 	cvtColor(img, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
 	inRange(imgHSV, levelsMin, levelsMax, tresh);
 
-	if(hMin > hMax){
+	if (hMin > hMax) {
 		Mat treshTmp;
-		Scalar levelsMin( hMin,sMin,vMin);
-		Scalar levelsMax( 255,sMax,vMax);
+		Scalar levelsMin(hMin, sMin, vMin);
+		Scalar levelsMax(255, sMax, vMax);
 		inRange(imgHSV, levelsMin, levelsMax, treshTmp);
 
-		Scalar levelsMin2( 1,sMin,vMin);
-		Scalar levelsMax2( hMax,sMax,vMax);
+		Scalar levelsMin2(1, sMin, vMin);
+		Scalar levelsMax2(hMax, sMax, vMax);
 		inRange(imgHSV, levelsMin2, levelsMax2, tresh);
 		cout << "min: " << levelsMin << endl;
 		cout << "max: " << levelsMax << endl;
 		tresh = tresh | treshTmp;
-		}else{
-			inRange(imgHSV, levelsMin, levelsMax, tresh);
-		}
-
+	} else {
+		inRange(imgHSV, levelsMin, levelsMax, tresh);
+	}
 
 	this->imgTresholded = tresh;
 	return this->imgTresholded;
 }
 
-
-void Marker::initWindowTrackbars(){
+void Marker::initWindowTrackbars() {
 	stringstream ss;
 	ss << ++this->markerCnt;
 	string str = "Marker " + ss.str();
@@ -213,24 +208,23 @@ void Marker::initWindowTrackbars(){
 
 	namedWindow(str, CV_WINDOW_NORMAL);
 
-	createTrackbar("Hue min", str, (this->levelsMin[0]),255);
-	createTrackbar("Saturation min", str, (this->levelsMin[1]),255);
-	createTrackbar("Value min", str, (this->levelsMin[2]),255);
+	createTrackbar("Hue min", str, (this->levelsMin[0]), 255);
+	createTrackbar("Saturation min", str, (this->levelsMin[1]), 255);
+	createTrackbar("Value min", str, (this->levelsMin[2]), 255);
 
-	createTrackbar("Hue max", str, (this->levelsMax[0]),255);
-	createTrackbar("Saturation max", str, (this->levelsMax[1]),255);
-	createTrackbar("Value max", str, (this->levelsMax[2]),255);
+	createTrackbar("Hue max", str, (this->levelsMax[0]), 255);
+	createTrackbar("Saturation max", str, (this->levelsMax[1]), 255);
+	createTrackbar("Value max", str, (this->levelsMax[2]), 255);
 
-	createTrackbar("Struct size", str, this->structSize ,30);
-	createTrackbar("Median filter size", str, this->medianSize ,50);
-	createTrackbar("Closure size", str, this->closureSize ,10);
-	createTrackbar("Opening size", str, this->openingSize ,10);
+	createTrackbar("Struct size", str, this->structSize, 30);
+	createTrackbar("Median filter size", str, this->medianSize, 50);
+	createTrackbar("Closure size", str, this->closureSize, 10);
+	createTrackbar("Opening size", str, this->openingSize, 10);
 }
 
 Mat Marker::getTresholdedImage() {
 	return this->imgTresholded;
 }
-
 
 Point& Marker::calculateCenter() {
 
@@ -240,10 +234,9 @@ Point& Marker::calculateCenter() {
 	double dM10 = oMoments.m10;
 	double dArea = oMoments.m00;
 
-	// if the area <= 10000, I consider that the there are no object in the image and it's because of the noise, the area is not zero
-	if (dArea > 10000)
-	{
-		//calculate the position of the ball
+	// jesli dArea <= 10000, zakladamy, ze to nie obiekt, tylko szum
+	if (dArea > 10000) {
+		//wspolrzedne srodka ciezkosci
 		int posX = dM10 / dArea;
 		int posY = dM01 / dArea;
 
@@ -254,7 +247,7 @@ Point& Marker::calculateCenter() {
 	return center;
 }
 
-void Marker::setBlobSize(int* min, int* max){
+void Marker::setBlobSize(int* min, int* max) {
 	delete this->minBlob;
 	delete this->maxBlob;
 	this->minBlob = min;
@@ -264,53 +257,56 @@ void Marker::setBlobSize(int* min, int* max){
 void Marker::fillHoles() {
 
 	//median size has to be odd
-		int medianSize = ((*this->medianSize) % 2) ? *(this->medianSize)  : *(this->medianSize) +1;
-		medianBlur(imgTresholded,imgTresholded,medianSize);
+	int medianSize =
+			((*this->medianSize) % 2) ?
+					*(this->medianSize) : *(this->medianSize) + 1;
+	medianBlur(imgTresholded, imgTresholded, medianSize);
 
 	int structSize = *(this->structSize) > 0 ? *(this->structSize) : 1;
 
-	//morphological opening (removes small objects from the foreground)
-	for(int i = 0; i< (*this->openingSize); i++){
+	//morfologiczne otwarcie
+	for (int i = 0; i < (*this->openingSize); i++) {
 		erode(imgTresholded, imgTresholded,
-					getStructuringElement(MORPH_ELLIPSE, Size(structSize,structSize)));
-			dilate(imgTresholded, imgTresholded,
-					getStructuringElement(MORPH_ELLIPSE, Size(structSize,structSize)));
+				getStructuringElement(MORPH_ELLIPSE,
+						Size(structSize, structSize)));
+		dilate(imgTresholded, imgTresholded,
+				getStructuringElement(MORPH_ELLIPSE,
+						Size(structSize, structSize)));
 	}
 
-
-	//morphological closing (removes small holes from the foreground)
-	for(int i = 0; i< (*this->closureSize); i++){
+	//morfologiczne zamkniecie
+	for (int i = 0; i < (*this->closureSize); i++) {
 		dilate(imgTresholded, imgTresholded,
-					getStructuringElement(MORPH_ELLIPSE, Size(structSize,structSize)));
-			erode(imgTresholded, imgTresholded,
-					getStructuringElement(MORPH_ELLIPSE, Size(structSize,structSize)));
-		}
+				getStructuringElement(MORPH_ELLIPSE,
+						Size(structSize, structSize)));
+		erode(imgTresholded, imgTresholded,
+				getStructuringElement(MORPH_ELLIPSE,
+						Size(structSize, structSize)));
+	}
 
 	// convert cv::Mat to IplImage
 	IplImage img2 = img;
-
 
 	// convert to grayscale
 	IplImage gray = imgTresholded;
 
 	// get blobs
-	IplImage *labelImg = cvCreateImage( cvGetSize(&gray), IPL_DEPTH_LABEL, 1 );
+	IplImage *labelImg = cvCreateImage(cvGetSize(&gray), IPL_DEPTH_LABEL, 1);
 	CvBlobs blobs;
-	unsigned int result = cvLabel( &gray, labelImg, blobs );
+	unsigned int result = cvLabel(&gray, labelImg, blobs);
 
-	cvFilterByArea(blobs,*minBlob,*maxBlob);
+	cvFilterByArea(blobs, *minBlob, *maxBlob);
 
 	// render blobs in original image
-	cvRenderBlobs( labelImg, blobs, &img2, &img2 );
+	cvRenderBlobs(labelImg, blobs, &img2, &img2);
 
 	// *always* remember freeing unused IplImages
-	cvReleaseImage( &labelImg );
+	cvReleaseImage(&labelImg);
 
 	// convert back to cv::Mat
 	//cv::Mat output( &img );
 }
 
 int Marker::markerCnt = 0;
-
 
 #endif /* MARKER_H_ */
