@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
 	namedWindow("Original", CV_WINDOW_AUTOSIZE);
 	setMouseCallback("Original", ColorDetection::mouseHandler, NULL);
 
-	VideoCapture cap(1); //capture the video from webcam
+	VideoCapture cap(s.cameraInput); //capture the video from webcam
 	if (!cap.isOpened())  // if not success, exit program
 	{
 		cout << "Cannot open the web cam" << endl;
